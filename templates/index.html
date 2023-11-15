@@ -9,7 +9,13 @@
 </head>
     <body>
         <main class="container">
-            <article>
+            <div>
+                <label for="theme-toggle" style="display: flex; justify-content: end;">
+                    <input id="theme-toggle" type="checkbox" role="switch" checked />
+                    Dark Mode
+                </label>
+            </div>
+            <article id="summary-card">
                 <form id="yt-summary-form" action="/yt-summary">
                     <div class="grid">
                         <label for="yt-url">
@@ -24,6 +30,17 @@
             </article>
         </main>
         <script type="application/javascript">
+            document.getElementById('theme-toggle').addEventListener('change', function (e) {
+                document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light');
+                localStorage.setItem('data-theme', this.checked ? 'dark' : 'light');
+            });
+
+            const persistedTheme = localStorage.getItem('data-theme');
+            if (persistedTheme) {
+                document.documentElement.setAttribute('data-theme', persistedTheme);
+            }
+
+
             document.getElementById('yt-summary-form').addEventListener('submit', function (e) {
                 e.preventDefault();
                 
