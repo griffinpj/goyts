@@ -1,10 +1,13 @@
 package main
 
 import (
+    "io"
+    "os"
     "net/http"
     "fmt"
     "time"
     "html/template"
+    "github.com/kkdai/youtube/v2"
 )
 
 type Route struct {
@@ -16,6 +19,35 @@ type Route struct {
 
 type ViewData struct {
     Message string
+}
+
+func getAudio (video string) {
+	client := youtube.Client{}
+
+	audio, err := client.GetVideo(video)
+	if err != nil {
+		panic(err)
+	}
+
+	formats := audio.Formats.WithAudioChannels() // only get videos with audio
+	stream, _, err := client.GetStream(audio, &formats[0])
+	if err != nil {
+		panic(err)
+	}
+
+	defer stream.Close()
+    
+    newFileName := fmt.Sprintf("tmp/%s.mp4", video)
+	file, err := os.Create(newFileName)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	_, err = io.Copy(file, stream)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func renderTemplate(templatePath string, data interface {}) http.Handler {
@@ -61,7 +93,10 @@ func createRoutes () [] Route {
             Path: "/yt-summary", 
             Method: "POST", 
             Handler: http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
-                fmt.Fprint(w, "summary")
+                videoId := r.FormValue("video")
+                getAudio(videoId)
+
+                fmt.Fprint(w, videoId)
             }), 
             Middleware: [] func (http.Handler) http.Handler { 
                 logRequestTime, 

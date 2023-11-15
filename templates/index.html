@@ -9,12 +9,10 @@
 </head>
     <body>
         <main class="container">
-            <div>
-                <label for="theme-toggle" style="display: flex; justify-content: end;">
-                    <input id="theme-toggle" type="checkbox" role="switch" checked />
-                    Dark Mode
-                </label>
-            </div>
+            <label for="theme-toggle">
+                <input id="theme-toggle" type="checkbox" role="switch" checked />
+                Dark Mode
+            </label>
             <article id="summary-card">
                 <form id="yt-summary-form" action="/yt-summary">
                     <div class="grid">
@@ -23,44 +21,72 @@
                             <input autocomplete="off" name="video_url" type="url" id="yt-url" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
                         </label>
                     </div>
-                    <button type="submit" class="">
+                    <button id="summary-button" type="submit" class="">
                         Summarize
                     </button>
                 </form> 
             </article>
         </main>
         <script type="application/javascript">
-            document.getElementById('theme-toggle').addEventListener('change', function (e) {
-                document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light');
-                localStorage.setItem('data-theme', this.checked ? 'dark' : 'light');
-            });
+            const $themeToggle = document.getElementById('theme-toggle');
+            const $form = document.getElementById('yt-summary-form');
+            const $urlInput = document.getElementById('yt-url');
+            const $button = document.getElementById('summary-button');
+            const $html = document.documentElement;
 
-            const persistedTheme = localStorage.getItem('data-theme');
-            if (persistedTheme) {
-                document.documentElement.setAttribute('data-theme', persistedTheme);
-            }
-
-            document.getElementById('yt-summary-form').addEventListener('submit', function (e) {
-                e.preventDefault();
-                
-                const url = this.attributes['action'].value;
-                const videoURL = document.getElementById('yt-url').value;
-                const params = new URLSearchParams({ video: videoURL });
-
-                if (!videoURL || !videoURL.length) {
-                    document.getElementById('yt-url').setAttribute('aria-invalid', true);
-                    return
+            const summaryRequest = ({ url, video_url}, cb) => {
+                if (!video_url || !video_url.length) {
+                    $urlInput.setAttribute('aria-invalid', true);
+                    return;
                 } else {
-                    document.getElementById('yt-url').setAttribute('aria-invalid', false);
+                    $urlInput.setAttribute('aria-invalid', false);
                 }
+
+                const videoURLParams = new URL(video_url).searchParams;
+                const videoId = videoURLParams.get('v');
+
+                if (!videoId) {
+                    $urlInput.setAttribute('aria-invalid', true);
+                    return;
+                } else {
+                    $urlInput.setAttribute('aria-invalid', false);
+                }
+
+                const formData = new FormData();
+                formData.append('video', videoId);
 
                 var r = new XMLHttpRequest();
                 r.open("POST", url, true);
                 r.onreadystatechange = function () {
+                    cb(r);
+                    $button.setAttribute('aria-busy', false);
+                };
+                r.send(formData);
+                $button.setAttribute('aria-busy', true);
+            };
+
+            $themeToggle.addEventListener('change', function (e) {
+                document.documentElement.setAttribute('data-theme', this.checked ? 'dark' : 'light');
+                localStorage.setItem('data-theme', this.checked ? 'dark' : 'light');
+            });
+
+            const persistedTheme = localStorage.getItem('data-theme') || 'dark';
+            localStorage.setItem('data-theme', persistedTheme);
+
+            $themeToggle.setAttribute('checked', persistedTheme === 'dark');
+
+            $html.setAttribute('data-theme', persistedTheme);
+
+            $form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                const url = this.attributes['action'].value;
+                const videoURL = document.getElementById('yt-url').value;
+
+                summaryRequest({ url, video_url: videoURL }, (r) => {
                     if (r.readyState != 4 || r.status != 200) return;
                     alert("Success: " + r.responseText);
-                };
-                r.send(params);
+                });
             });
         </script>
     </body>
