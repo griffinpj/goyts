@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GOYTS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+    <body>
+        <main class="container">
+            <article>
+                <form id="yt-summary-form" action="/yt-summary">
+                    <div class="grid">
+                        <label for="yt-url">
+                            Input a youtube video
+                            <input autocomplete="off" name="video_url" type="url" id="yt-url" placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"/>
+                        </label>
+                    </div>
+                    <button type="submit" class="">
+                        Summarize
+                    </button>
+                </form> 
+            </article>
+        </main>
+        <script type="application/javascript">
+            document.getElementById('yt-summary-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                const url = this.attributes['action'].value;
+                const videoURL = document.getElementById('yt-url').value;
+                const params = new URLSearchParams({ video: videoURL });
+
+                var r = new XMLHttpRequest();
+                r.open("POST", url, true);
+                r.onreadystatechange = function () {
+                    if (r.readyState != 4 || r.status != 200) return;
+                    alert("Success: " + r.responseText);
+                };
+                r.send(params);
+            });
+        </script>
+    </body>
+</html>
+
