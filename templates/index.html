@@ -40,13 +40,19 @@
                 document.documentElement.setAttribute('data-theme', persistedTheme);
             }
 
-
             document.getElementById('yt-summary-form').addEventListener('submit', function (e) {
                 e.preventDefault();
                 
                 const url = this.attributes['action'].value;
                 const videoURL = document.getElementById('yt-url').value;
                 const params = new URLSearchParams({ video: videoURL });
+
+                if (!videoURL || !videoURL.length) {
+                    document.getElementById('yt-url').setAttribute('aria-invalid', true);
+                    return
+                } else {
+                    document.getElementById('yt-url').setAttribute('aria-invalid', false);
+                }
 
                 var r = new XMLHttpRequest();
                 r.open("POST", url, true);
