@@ -5,7 +5,7 @@ import (
     "fmt"
     "time"
     "html/template"
-    L "goyts/lib"
+    lib "goyts/lib"
 )
 
 type Route struct {
@@ -63,9 +63,12 @@ func InitRoutes () [] Route {
             Method: "POST", 
             Handler: http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
                 videoId := r.FormValue("video")
-                L.GetAudio(videoId)
+                err := lib.GetAudio(videoId)
+                if err != nil {
+                    panic(err)
+                }
 
-                fmt.Fprint(w, videoId)
+                fmt.Fprint(w, fmt.Sprintf("Video ID %s converted to audio", videoId))
             }), 
             Middleware: [] func (http.Handler) http.Handler { 
                 logRequestTime, 
