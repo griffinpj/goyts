@@ -73,7 +73,14 @@ func InitRoutes () [] Route {
                     panic(err)
                 }
 
-                fmt.Fprintf(w, fmt.Sprintf("%s", content))
+                err, summary := lib.OllamaSummary(string(content))
+                if err != nil {
+                    panic(err)
+                }
+
+                fmt.Printf("%s", summary)
+
+                fmt.Fprintf(w, string(summary))
             }), 
             Middleware: [] func (http.Handler) http.Handler { 
                 logRequestTime, 
