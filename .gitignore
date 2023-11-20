@@ -1,1 +1,3 @@
 /tmp
+/audio/*
+.env

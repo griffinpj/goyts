@@ -3,8 +3,18 @@ package main
 import (
     "net/http"
     "fmt"
+    "github.com/joho/godotenv"
     Routes "goyts/routes"
+    "log"
 )
+
+// init is invoked before main()
+func init() {
+    // loads values from .env into the system
+    if err := godotenv.Load(); err != nil {
+        log.Print("No .env file found")
+    }
+}
 
 func setupRoutes () {
     for _, route := range Routes.InitRoutes() {

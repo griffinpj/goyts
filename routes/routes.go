@@ -52,7 +52,7 @@ func InitRoutes () [] Route {
             Path: "/", 
             Method: "GET", 
             Handler: renderTemplate("templates/index.html", ViewData {
-                Message: "Hello, World",
+                Message: "GOYTS",
             }),
             Middleware: [] func (http.Handler) http.Handler { 
                 logRequestTime, 
@@ -68,7 +68,12 @@ func InitRoutes () [] Route {
                     panic(err)
                 }
 
-                fmt.Fprint(w, fmt.Sprintf("Video ID %s converted to audio", videoId))
+                err, content := lib.TranscribeWithWhisper(videoId)
+                if err != nil {
+                    panic(err)
+                }
+
+                fmt.Fprintf(w, fmt.Sprintf("%s", content))
             }), 
             Middleware: [] func (http.Handler) http.Handler { 
                 logRequestTime, 
