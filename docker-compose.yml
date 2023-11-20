@@ -1,0 +1,11 @@
+version: "0.1"
+services:
+  app:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    environment:
+      OLLAMA_HOST: ${OLLAMA_HOST}
+      WHISPER_HOST: ${WHISPER_HOST}
+    ports:
+      - "127.0.0.1:8080:${PORT}"
