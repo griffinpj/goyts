@@ -13,3 +13,4 @@
 ### Libraries
 - [youtube](https://github.com/kkdai/youtube)
 - [whisper](https://github.com/ahmetoner/whisper-asr-webservice/)  
+- [ollama](https://github.com/jmorganca/ollama)  
