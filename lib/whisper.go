@@ -5,7 +5,6 @@ import (
     "os"
     "io"
     "path/filepath"
-    "io/ioutil"
     "fmt"
     "bytes"
     "mime/multipart"
@@ -52,7 +51,7 @@ func TranscribeWithWhisper (videoId string) (error, [] byte) {
         return err, nil
     }
 
-    content, err := ioutil.ReadAll(res.Body)
+    content, err := io.ReadAll(res.Body)
     if err != nil {
         return err, nil
     }
