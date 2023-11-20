@@ -1,11 +1,11 @@
 package lib
 
 import (
-    "io"
-    "os"
-    "fmt"
-    "github.com/kkdai/youtube/v2"
-    ffmpeg "github.com/u2takey/ffmpeg-go"
+	"fmt"
+	"goyts/utils"
+	"io"
+	"os"
+	"github.com/kkdai/youtube/v2"
 )
 
 func downloadVideo (video string) error {
@@ -41,24 +41,19 @@ func downloadVideo (video string) error {
     return nil
 }
 
-func extractAudio (video string) error {
-    // Convert local video file to audio via ffmpeg
-    err := ffmpeg.
-        Input(fmt.Sprintf("tmp/%s.mp4", video), ffmpeg.KwArgs{"format": "mp4"}).
-        Output(fmt.Sprintf("audio/%s.mp3", video), ffmpeg.KwArgs{"format": "mp3"}).
-        OverWriteOutput().
-        ErrorToStdOut().
-        Run()
-
+func extractAudio (video string, keepOriginal bool) error {
+    err := utils.ExtractAudio(fmt.Sprintf("tmp/%s.mp4", video), fmt.Sprintf("audio/%s.mp3", video))
 	if err != nil {
         return err
 	}
 
     // Remove temporary video file
-	err = os.Remove(fmt.Sprintf("tmp/%s.mp4", video))
-	if err != nil {
-        return err
-	}
+    if !keepOriginal {
+        err = os.Remove(fmt.Sprintf("tmp/%s.mp4", video))
+        if err != nil {
+            return err
+        }
+    }
     
     return nil
 }
@@ -69,7 +64,7 @@ func GetAudio (video string) error {
         return err
 	}
 
-    err = extractAudio(video)
+    err = extractAudio(video, false)
 	if err != nil {
         return err
 	}

@@ -3,14 +3,20 @@ package routes
 import (
     "net/http"
     "fmt"
+    "errors"
+    "os"
     lib "goyts/lib"
 )
 
 func YTSummary (w http.ResponseWriter, r *http.Request) {
     videoId := r.FormValue("video")
-    err := lib.GetAudio(videoId)
-    if err != nil {
-        panic(err)
+
+    if _, err := os.Stat(fmt.Sprintf("audio/%s.mp3", videoId)); errors.Is(err, os.ErrNotExist) {
+        // path/to/whatever does not exist
+        err := lib.GetAudio(videoId)
+        if err != nil {
+            panic(err)
+        }
     }
 
     err, content := lib.TranscribeWithWhisper(videoId)
@@ -22,8 +28,6 @@ func YTSummary (w http.ResponseWriter, r *http.Request) {
     if err != nil {
         panic(err)
     }
-
-    fmt.Printf("%s", summary)
 
     fmt.Fprintf(w, string(summary))
 }

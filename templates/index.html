@@ -6,6 +6,11 @@
     <title>GOYTS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        .hide {
+            display: none;
+        }
+    </style>
 </head>
     <body>
         <main class="container">
@@ -25,6 +30,10 @@
                         Summarize
                     </button>
                 </form> 
+            </article>
+            <article id="summary-response-container" class="hide">
+                <header><h2>Summary</h2></header>
+                <div id="summary-response"></div>
             </article>
         </main>
         <script type="application/javascript">
@@ -85,7 +94,19 @@
 
                 summaryRequest({ url, video_url: videoURL }, (r) => {
                     if (r.readyState != 4 || r.status != 200) return;
-                    alert("Success: " + r.responseText);
+                    let res;
+                    try {
+                        res = JSON.parse(r.responseText) ;
+                    } catch (e) {
+                        res = {};
+                    }
+
+                    const $summaryResponse = document.getElementById('summary-response');
+                    const $summaryContainer = document.getElementById('summary-response-container');
+                    $summaryResponse.innerHTML = 
+                        res.response || 'Something went wrong or the video may be too long';
+
+                    $summaryContainer.classList.remove('hide');
                 });
             });
         </script>

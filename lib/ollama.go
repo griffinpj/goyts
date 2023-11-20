@@ -4,10 +4,8 @@ import (
     "os"
     "errors"
     "fmt"
-    "bytes"
-    "io"
-    "net/http"
     "strings"
+    utils "goyts/utils"
 )
 
 func OllamaSummary (summary string) (error, [] byte) {
@@ -20,27 +18,11 @@ func OllamaSummary (summary string) (error, [] byte) {
 
     jsonBody := fmt.Sprintf(`{
         "model": "llama2:13b",
-        "prompt": "Please summarize the following in as many needed paragraphs, '%s'",
+        "prompt": "Please summarize the following video transcription. Your response will only prefixed with Summary: X, where X is the start of your summary without introduction., '%s'",
         "stream": false
     }`, strings.Replace(summary, "\n", "", -1))
 
-    var jsonData = []byte(jsonBody)
-
-    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
-    if err != nil {
-        return err, nil
-    }
-    req.Header.Set("Content-Type", "application/json; charset=UTF-8")
-
-    client := &http.Client{}
-    res, err := client.Do(req)
-    if err != nil {
-        return err, nil
-    }
-
-    defer res.Body.Close()
-   
-    body, err := io.ReadAll(res.Body)
+    err, body := utils.PostJson(jsonBody, url)
     if err != nil {
         return err, nil
     }

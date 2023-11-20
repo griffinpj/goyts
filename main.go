@@ -5,6 +5,8 @@ import (
     "fmt"
     "github.com/joho/godotenv"
     "log"
+    "os"
+    "errors"
     Routes "goyts/routes"
 )
 
@@ -35,8 +37,16 @@ func setupRoutes () {
 
 func main () {
     setupRoutes()
+    
+    port, exists := os.LookupEnv("PORT")
+    if !exists {
+        panic(errors.New("No port defined"))
+    }
 
-    port := 8080
-	fmt.Printf("Server running on :%d...\n", port)
-	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	fmt.Printf("Server running on :%s...\n", port)
+
+    err := http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+    if err != nil {
+        panic (err)
+    }
 }
