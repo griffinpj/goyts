@@ -4,13 +4,11 @@ import (
     "net/http"
     "fmt"
     "github.com/joho/godotenv"
-    Routes "goyts/routes"
     "log"
+    Routes "goyts/routes"
 )
 
-// init is invoked before main()
 func init() {
-    // loads values from .env into the system
     if err := godotenv.Load(); err != nil {
         log.Print("No .env file found")
     }
