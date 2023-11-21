@@ -15,7 +15,7 @@
     <body>
         <main class="container">
             <label for="theme-toggle">
-                <input id="theme-toggle" type="checkbox" role="switch" checked />
+                <input id="theme-toggle" type="checkbox" role="switch" />
                 Dark Mode
             </label>
             <article id="summary-card">
@@ -79,10 +79,14 @@
                 localStorage.setItem('data-theme', this.checked ? 'dark' : 'light');
             });
 
+            console.log('persisted theme');
+            console.log(localStorage.getItem('data-theme'));
             const persistedTheme = localStorage.getItem('data-theme') || 'dark';
             localStorage.setItem('data-theme', persistedTheme);
 
-            $themeToggle.setAttribute('checked', persistedTheme === 'dark');
+            if (persistedTheme === 'dark') {
+                $themeToggle.setAttribute('checked', true);
+            }
 
             $html.setAttribute('data-theme', persistedTheme);
 
